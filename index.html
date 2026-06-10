@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOT Mining Store BTC — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --purple:#a855f7;--purple-glow:#c084fc;
+  --btc:#f7931a;--btc-dark:#c97015;--btc-glow:#fbbf84;
+  --cyan:#22d3ee;--green:#22c55e;--red:#ef4444;--orange:#f97316;
+  --dark:#09080f;--card-bg:#090810;--border:rgba(247,147,26,.13)
+}
+body{background:var(--dark);font-family:'Rajdhani',sans-serif;min-height:100vh;padding:20px 24px 80px;color:#fff;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--btc),var(--cyan),var(--purple));z-index:100;animation:borderAnim 4s linear infinite;background-size:200%}
+@keyframes borderAnim{0%{background-position:0%}100%{background-position:200%}}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;padding-top:10px}
+.logo{font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;letter-spacing:1px}
+.logo em{font-style:normal;background:linear-gradient(90deg,var(--btc),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo-sub{font-size:9px;color:rgba(255,255,255,.3);letter-spacing:3px;text-transform:uppercase;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* STATUS */
+.bot-status{display:flex;align-items:center;gap:8px;padding:5px 14px;border:1px solid;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase}
+.bot-status.active{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.06);color:var(--green)}
+.bot-status.inactive{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.06);color:var(--red)}
+.bot-status.waiting{border-color:rgba(247,147,26,.4);background:rgba(247,147,26,.06);color:var(--btc)}
+.bot-status.active .sdot{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.4s infinite}
+.bot-status.waiting .sdot{background:var(--btc);box-shadow:0 0 6px var(--btc);animation:blink 2s infinite}
+.bot-status.inactive .sdot{background:var(--red)}
+.sdot{width:7px;height:7px;border-radius:50%}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.last-upd{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1px}
+
+/* UTC CLOCK */
+.utc-clock{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:2px}
+.utc-clock span{color:var(--btc)}
+
+/* CHALLENGE PROGRESS */
+.challenge-section{background:var(--card-bg);border:1px solid rgba(247,147,26,.2);padding:20px 24px;margin-bottom:18px;position:relative;overflow:hidden}
+.challenge-section::before{content:'';position:absolute;top:0;left:0;width:16px;height:16px;border-top:1.5px solid var(--btc);border-left:1.5px solid var(--btc)}
+.challenge-section::after{content:'';position:absolute;bottom:0;right:0;width:16px;height:16px;border-bottom:1.5px solid var(--purple);border-right:1.5px solid var(--purple)}
+.chal-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.chal-title{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:var(--btc);text-transform:uppercase}
+.chal-phase{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:2px;margin-top:3px}
+.chal-meta{display:flex;gap:28px;flex-wrap:wrap}
+.cmeta-item{text-align:right}
+.cmeta-val{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;line-height:1}
+.cmeta-label{font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.3);text-transform:uppercase;margin-top:3px}
+.chal-bar-bg{height:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);position:relative;overflow:hidden;margin-bottom:8px}
+.chal-bar-fill{height:100%;background:linear-gradient(90deg,var(--btc-dark),var(--btc),var(--btc-glow));transition:width 1.2s cubic-bezier(.22,1,.36,1);position:relative}
+.chal-bar-fill::after{content:'';position:absolute;top:0;right:0;bottom:0;width:40px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3));animation:shimmer 2s ease-in-out infinite}
+@keyframes shimmer{0%,100%{opacity:0}50%{opacity:1}}
+.chal-dd-bg{height:6px;background:rgba(255,255,255,.03);border:1px solid rgba(239,68,68,.1);position:relative;overflow:hidden}
+.chal-dd-fill{height:100%;background:linear-gradient(90deg,#7f1d1d,var(--red));transition:width 1s cubic-bezier(.22,1,.36,1)}
+.chal-labels{display:flex;justify-content:space-between;margin-top:5px}
+.chl{font-size:10px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:1px}
+.chl.current{color:var(--btc)}
+
+/* ORB WINDOW */
+.orb-banner{display:flex;align-items:center;gap:12px;padding:10px 16px;border:1px solid;margin-bottom:18px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.orb-banner.active-window{border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.05);color:var(--green)}
+.orb-banner.range-build{border-color:rgba(247,147,26,.3);background:rgba(247,147,26,.05);color:var(--btc)}
+.orb-banner.closed{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.02);color:rgba(255,255,255,.3)}
+.orb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.orb-banner.active-window .orb-dot{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.4s infinite}
+.orb-banner.range-build .orb-dot{background:var(--btc);animation:blink 2s infinite}
+.orb-banner.closed .orb-dot{background:rgba(255,255,255,.2)}
+.orb-info{margin-left:auto;display:flex;gap:20px}
+.orb-info-item{text-align:right}
+.orb-info-label{font-size:8px;color:rgba(255,255,255,.3);letter-spacing:1px}
+.orb-info-val{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:#fff}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}
+@media(max-width:900px){.stats-row{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:500px){.stats-row{grid-template-columns:1fr 1fr}}
+.stat-card{background:var(--card-bg);border:1px solid var(--border);padding:14px 16px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:12px;height:12px;border-top:1px solid var(--btc);border-left:1px solid var(--btc)}
+.stat-label{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:6px}
+.stat-val{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;line-height:1}
+.stat-val.btc{color:var(--btc)}
+.stat-val.green{color:var(--green)}
+.stat-val.red{color:var(--red)}
+.stat-val.purple{color:var(--purple-glow)}
+.stat-val.cyan{color:var(--cyan)}
+.stat-sub{font-size:11px;color:rgba(255,255,255,.35);margin-top:4px}
+
+/* SECTION TITLE */
+.section-title{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;color:var(--btc);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(247,147,26,.2),transparent)}
+
+/* ACCOUNT CARD */
+.acc-card{background:var(--card-bg);border:1px solid var(--border);padding:20px 22px;position:relative;overflow:hidden;transition:transform .3s cubic-bezier(.22,1,.36,1)}
+.acc-card:hover{transform:translateY(-3px)}
+.acc-card::before{content:'';position:absolute;top:0;left:0;width:14px;height:14px;border-top:1.5px solid var(--btc);border-left:1.5px solid var(--btc)}
+.acc-card.passed{border-color:rgba(34,197,94,.3)}
+.acc-card.passed::before{border-color:var(--green)}
+.acc-card.burned{border-color:rgba(239,68,68,.3);opacity:.7}
+.acc-card.burned::before{border-color:var(--red)}
+
+.acc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.acc-name{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:900;color:#fff;line-height:1.2}
+.acc-server{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1px;margin-top:3px}
+.acc-badge{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 9px;border:1px solid}
+.acc-badge.active{color:var(--green);border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.06)}
+.acc-badge.passed{color:var(--cyan);border-color:rgba(34,211,238,.3);background:rgba(34,211,238,.06)}
+.acc-badge.burned{color:var(--red);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.06)}
+.acc-badge.challenge{color:var(--btc);border-color:rgba(247,147,26,.3);background:rgba(247,147,26,.06)}
+
+.acc-balance-row{display:flex;align-items:flex-end;gap:14px;margin-bottom:4px;flex-wrap:wrap}
+.acc-balance{font-family:'Orbitron',sans-serif;font-size:26px;font-weight:900;color:var(--btc);line-height:1}
+.acc-btcprice{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,.35);padding-bottom:2px}
+.acc-pnl{font-size:12px;font-weight:700;margin-bottom:14px}
+.acc-pnl.pos{color:var(--green)}
+.acc-pnl.neg{color:var(--red)}
+.acc-pnl.neu{color:rgba(255,255,255,.3)}
+
+.acc-progress{margin-bottom:8px}
+.acc-prog-header{display:flex;justify-content:space-between;margin-bottom:5px}
+.acc-prog-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.acc-prog-val{font-size:10px;font-weight:700;color:var(--btc)}
+.acc-prog-bar{height:5px;background:rgba(255,255,255,.06);overflow:hidden}
+.acc-prog-fill{height:100%;background:linear-gradient(90deg,var(--btc-dark),var(--btc));transition:width 1s cubic-bezier(.22,1,.36,1)}
+.acc-prog-fill.dd{background:linear-gradient(90deg,#7f1d1d,var(--red))}
+
+.acc-divider{height:1px;background:rgba(255,255,255,.05);margin:12px 0}
+.acc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.acc-stat{text-align:center}
+.acc-stat-val{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;color:#fff;line-height:1}
+.acc-stat-label{font-size:8px;color:rgba(255,255,255,.28);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+/* POSICION ACTIVA */
+.position-section{background:var(--card-bg);border:1px solid rgba(168,85,247,.15);padding:18px 20px;margin-bottom:18px}
+.no-position{color:rgba(255,255,255,.2);font-size:13px;letter-spacing:1px;padding:12px 0;text-align:center}
+.pos-card{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+.pos-type-badge{font-family:'Orbitron',sans-serif;font-size:28px;font-weight:900;padding:14px 18px;border:2px solid;text-align:center;min-width:90px}
+.pos-type-badge.long{color:var(--green);border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.04);text-shadow:0 0 20px rgba(34,197,94,.4)}
+.pos-type-badge.short{color:var(--red);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.04);text-shadow:0 0 20px rgba(239,68,68,.4)}
+.pos-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+.pos-field{}
+.pf-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:3px}
+.pf-val{font-family:'Orbitron',sans-serif;font-size:15px;font-weight:700;color:#fff}
+.pf-val.pnl-pos{color:var(--green)}
+.pf-val.pnl-neg{color:var(--red)}
+.pf-val.sl-val{color:rgba(239,68,68,.7)}
+.pf-val.tp-val{color:rgba(34,197,94,.7)}
+
+/* HISTORIAL */
+.hist-section{background:var(--card-bg);border:1px solid var(--border);padding:18px 20px;margin-bottom:18px}
+.hist-table{width:100%;border-collapse:collapse;font-size:11px}
+.hist-table th{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);text-align:left;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.05)}
+.hist-table td{padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.04);font-weight:600}
+.hist-table tr:last-child td{border-bottom:none}
+.hist-table tr:hover td{background:rgba(255,255,255,.02)}
+.ht-type{font-size:10px;font-weight:700;letter-spacing:1px;padding:2px 8px;border:1px solid;display:inline-block}
+.ht-type.long{color:var(--green);border-color:rgba(34,197,94,.25)}
+.ht-type.short{color:var(--red);border-color:rgba(239,68,68,.25)}
+.ht-win{color:var(--green);font-weight:700}
+.ht-loss{color:var(--red)}
+.ht-eod{color:rgba(255,255,255,.4)}
+.ht-reason{font-size:9px;font-weight:700;letter-spacing:1px;padding:1px 6px;border:1px solid}
+.ht-reason.tp{color:var(--green);border-color:rgba(34,197,94,.2);background:rgba(34,197,94,.04)}
+.ht-reason.sl{color:var(--red);border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.04)}
+.ht-reason.eod{color:rgba(255,255,255,.4);border-color:rgba(255,255,255,.1)}
+
+/* STATS BACKTEST */
+.backtest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+@media(max-width:600px){.backtest-grid{grid-template-columns:1fr 1fr}}
+.bt-card{background:var(--card-bg);border:1px solid var(--border);padding:14px 16px;text-align:center;position:relative}
+.bt-card::before{content:'';position:absolute;top:0;left:0;width:10px;height:10px;border-top:1px solid var(--btc);border-left:1px solid var(--btc)}
+.bt-val{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:900;line-height:1;margin-bottom:4px}
+.bt-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3)}
+
+/* EQUITY CHART */
+.chart-section{background:var(--card-bg);border:1px solid var(--border);padding:18px 20px;margin-bottom:18px}
+.equity-chart{width:100%;height:160px;position:relative;overflow:hidden}
+.eq-canvas{width:100%;height:100%}
+.eq-zero{position:absolute;left:0;right:0;border-top:1px dashed rgba(255,255,255,.08)}
+
+.scan-line{position:fixed;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(247,147,26,.15),transparent);animation:scan 12s linear infinite;pointer-events:none;z-index:50}
+@keyframes scan{0%{top:-1px}100%{top:100vh}}
+
+/* FOOTER */
+.footer{text-align:center;margin-top:20px;font-size:10px;color:rgba(255,255,255,.15);letter-spacing:2px}
+</style>
+</head>
+<body>
+<div class="scan-line"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="logo">BOT MINING STORE <em>BTC</em></div>
+    <div class="logo-sub">ORB + MACD/RSI &nbsp;|&nbsp; BTCUSD H1 &nbsp;|&nbsp; Crypto Fund Trader</div>
+  </div>
+  <div class="header-right">
+    <div class="utc-clock">UTC <span id="utc-time">--:--:--</span></div>
+    <div class="bot-status inactive" id="bot-status">
+      <div class="sdot"></div>
+      <span id="bot-status-text">Desconectado</span>
+    </div>
+    <div class="last-upd">Actualizado: <span id="last-upd">--</span></div>
+  </div>
+</div>
+
+<!-- CHALLENGE PROGRESS -->
+<div class="challenge-section">
+  <div class="chal-top">
+    <div>
+      <div class="chal-title">Crypto Fund Trader — Challenge $10,000</div>
+      <div class="chal-phase" id="chal-phase">Fase 1 — Objetivo +8% | Max DD -10% | Daily DD -5%</div>
+    </div>
+    <div class="chal-meta">
+      <div class="cmeta-item">
+        <div class="cmeta-val" id="chal-balance" style="color:var(--btc)">$--</div>
+        <div class="cmeta-label">Balance actual</div>
+      </div>
+      <div class="cmeta-item">
+        <div class="cmeta-val" id="chal-pct" style="color:var(--green)">--%</div>
+        <div class="cmeta-label">Progreso</div>
+      </div>
+      <div class="cmeta-item">
+        <div class="cmeta-val" id="chal-dd" style="color:var(--red)">--%</div>
+        <div class="cmeta-label">DD actual</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra progreso hacia +8% -->
+  <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+    <span style="font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1px">PROGRESO OBJETIVO +8%</span>
+    <span style="font-size:9px;font-weight:700;color:var(--btc);letter-spacing:1px" id="chal-progress-pct">0%</span>
+  </div>
+  <div class="chal-bar-bg" style="margin-bottom:10px">
+    <div class="chal-bar-fill" id="chal-bar" style="width:0%"></div>
+  </div>
+
+  <!-- Barra drawdown hacia -10% -->
+  <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+    <span style="font-size:9px;color:rgba(255,255,255,.3);letter-spacing:1px">DRAWDOWN MAX USADO (-10% limite)</span>
+    <span style="font-size:9px;font-weight:700;color:var(--red);letter-spacing:1px" id="chal-dd-pct-txt">0%</span>
+  </div>
+  <div class="chal-dd-bg">
+    <div class="chal-dd-fill" id="chal-dd-bar" style="width:0%"></div>
+  </div>
+</div>
+
+<!-- ORB WINDOW BANNER -->
+<div class="orb-banner closed" id="orb-banner">
+  <div class="orb-dot"></div>
+  <span id="orb-status-text">Calculando ventana ORB...</span>
+  <div class="orb-info" id="orb-info" style="display:none">
+    <div class="orb-info-item">
+      <div class="orb-info-label">ORB HIGH</div>
+      <div class="orb-info-val" id="orb-high">--</div>
+    </div>
+    <div class="orb-info-item">
+      <div class="orb-info-label">ORB LOW</div>
+      <div class="orb-info-val" id="orb-low">--</div>
+    </div>
+    <div class="orb-info-item">
+      <div class="orb-info-label">RANGO</div>
+      <div class="orb-info-val" id="orb-range">--</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS RAPIDAS -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-label">Balance</div>
+    <div class="stat-val btc" id="s-balance">$--</div>
+    <div class="stat-sub" id="s-pnl">--</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Equity</div>
+    <div class="stat-val purple" id="s-equity">$--</div>
+    <div class="stat-sub" id="s-equity-diff">vs balance</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">DD Diario</div>
+    <div class="stat-val red" id="s-daily-dd">--%</div>
+    <div class="stat-sub">limite -5%</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Señal Actual</div>
+    <div class="stat-val cyan" id="s-signal">--</div>
+    <div class="stat-sub">ORB + MACD/RSI</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">BTC Price</div>
+    <div class="stat-val btc" id="s-btcprice">$--</div>
+    <div class="stat-sub" id="s-btcprice-sub">en vivo</div>
+  </div>
+</div>
+
+<!-- CUENTA ACTIVA -->
+<div class="section-title">Cuenta CFT en Operacion</div>
+<div id="acc-container" style="margin-bottom:18px">
+  <div style="color:rgba(255,255,255,.2);font-size:13px;padding:20px;letter-spacing:1px">Esperando datos del bot...</div>
+</div>
+
+<!-- POSICION ACTIVA -->
+<div class="position-section">
+  <div class="section-title" style="margin-bottom:14px">Posicion Abierta — BTCUSD</div>
+  <div id="pos-content"><div class="no-position">Sin posicion abierta — esperando breakout ORB</div></div>
+</div>
+
+<!-- ESTADISTICAS DE BACKTEST (REFERENCIA) -->
+<div class="section-title">Backtest de Referencia — Ene-Jun 2026</div>
+<div class="backtest-grid">
+  <div class="bt-card">
+    <div class="bt-val" style="color:var(--green)">+8.1%</div>
+    <div class="bt-label">Max alcanzado</div>
+  </div>
+  <div class="bt-card">
+    <div class="bt-val" style="color:var(--btc)">73 dias</div>
+    <div class="bt-label">Para +8% CFT</div>
+  </div>
+  <div class="bt-card">
+    <div class="bt-val" style="color:var(--red)">-3.4%</div>
+    <div class="bt-label">DD al target</div>
+  </div>
+  <div class="bt-card">
+    <div class="bt-val" style="color:var(--purple-glow)">35.7%</div>
+    <div class="bt-label">Winrate</div>
+  </div>
+  <div class="bt-card">
+    <div class="bt-val" style="color:var(--cyan)">2.16x</div>
+    <div class="bt-label">Ratio G/P</div>
+  </div>
+  <div class="bt-card">
+    <div class="bt-val" style="color:var(--btc)">1.20</div>
+    <div class="bt-label">Profit Factor</div>
+  </div>
+</div>
+
+<!-- EQUITY CHART -->
+<div class="chart-section">
+  <div class="section-title" style="margin-bottom:14px">Curva de Equity</div>
+  <div class="equity-chart">
+    <canvas class="eq-canvas" id="eq-canvas"></canvas>
+  </div>
+  <div style="display:flex;justify-content:space-between;margin-top:8px">
+    <span style="font-size:9px;color:rgba(255,255,255,.2);letter-spacing:1px">Capital inicial: $10,000</span>
+    <span style="font-size:9px;color:var(--btc);letter-spacing:1px;font-weight:700" id="eq-max">Max: $--</span>
+    <span style="font-size:9px;color:var(--red);letter-spacing:1px;font-weight:700" id="eq-min">Min: $--</span>
+  </div>
+</div>
+
+<!-- HISTORIAL DE TRADES -->
+<div class="hist-section">
+  <div class="section-title" style="margin-bottom:14px">Historial de Trades</div>
+  <div id="hist-content" style="overflow-x:auto">
+    <div style="color:rgba(255,255,255,.2);font-size:13px;padding:12px 0;text-align:center;letter-spacing:1px">Sin historial aun</div>
+  </div>
+</div>
+
+<div class="footer">BOT MINING STORE BTC &nbsp;|&nbsp; CRYPTO FUND TRADER &nbsp;|&nbsp; ORB + MACD/RSI BTCUSD H1</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const DATA_PATH    = "../botbtc-ms/data/";
+const INITIAL_BAL  = 10000;
+const CFT_TARGET   = 8;     // %
+const CFT_MAX_DD   = 10;    // %
+const CFT_DAILY_DD = 5;     // %
+
+// ── HELPERS ─────────────────────────────────────────────────────────────────
+async function fetchJSON(file) {
+  try {
+    const r = await fetch(DATA_PATH + file + "?t=" + Date.now());
+    if (!r.ok) return null;
+    return await r.json();
+  } catch { return null; }
+}
+
+const fmtUSD  = n => n == null ? "$--" : "$" + Number(n).toLocaleString("en-US", {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const fmtBTC  = n => n == null ? "$--" : "$" + Number(n).toLocaleString("en-US", {minimumFractionDigits: 0, maximumFractionDigits: 0});
+const fmt     = (n, d=2) => n != null ? Number(n).toFixed(d) : "--";
+const fmtPct  = n => (n >= 0 ? "+" : "") + fmt(n) + "%";
+const clamp   = (v, a, b) => Math.min(Math.max(v, a), b);
+
+// ── UTC CLOCK ────────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getUTCHours()).padStart(2,"0");
+  const m = String(now.getUTCMinutes()).padStart(2,"0");
+  const s = String(now.getUTCSeconds()).padStart(2,"0");
+  document.getElementById("utc-time").textContent = `${h}:${m}:${s}`;
+  updateORBBanner(now.getUTCHours());
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── ORB WINDOW BANNER ────────────────────────────────────────────────────────
+function updateORBBanner(utcHour, state) {
+  const banner = document.getElementById("orb-banner");
+  const txt    = document.getElementById("orb-status-text");
+  const orbInfo = document.getElementById("orb-info");
+
+  if (utcHour >= 0 && utcHour < 4) {
+    banner.className = "orb-banner range-build";
+    txt.textContent  = `UTC ${utcHour}:00 — Construyendo rango ORB (00:00-04:00 UTC)`;
+    orbInfo.style.display = "none";
+  } else if (utcHour >= 4 && utcHour < 20) {
+    banner.className = "orb-banner active-window";
+    txt.textContent  = `VENTANA ACTIVA — Vigilando breakouts ORB (04:00-20:00 UTC)`;
+    if (state?.orb) {
+      document.getElementById("orb-high").textContent  = fmtBTC(state.orb.high);
+      document.getElementById("orb-low").textContent   = fmtBTC(state.orb.low);
+      document.getElementById("orb-range").textContent = fmtBTC(state.orb.high - state.orb.low);
+      orbInfo.style.display = "flex";
+    }
+  } else {
+    banner.className = "orb-banner closed";
+    txt.textContent  = `UTC ${utcHour}:00 — Ventana cerrada. Proxima sesion: 04:00 UTC`;
+    orbInfo.style.display = "none";
+  }
+}
+
+// ── BTC PRICE (Yahoo Finance CORS fallback) ──────────────────────────────────
+let lastBTCPrice = null;
+async function fetchBTCPrice() {
+  try {
+    // Intentar desde el state del bot primero
+    return null; // Se lee desde state.json si el bot lo expone
+  } catch { return null; }
+}
+
+// ── CHALLENGE SECTION ────────────────────────────────────────────────────────
+function renderChallenge(cft) {
+  if (!cft) return;
+  document.getElementById("chal-balance").textContent = fmtUSD(cft.current_balance);
+
+  const profitPct = cft.profit_pct || 0;
+  const pctEl = document.getElementById("chal-pct");
+  pctEl.textContent = fmtPct(profitPct);
+  pctEl.style.color = profitPct >= 0 ? "var(--green)" : "var(--red)";
+
+  document.getElementById("chal-dd").textContent = fmt(Math.abs(cft.max_dd_pct || 0)) + "%";
+  document.getElementById("chal-progress-pct").textContent = fmt(cft.progress_pct || 0, 1) + "%";
+  document.getElementById("chal-bar").style.width = clamp(cft.progress_pct || 0, 0, 100) + "%";
+
+  const ddUsed = Math.abs(cft.max_dd_pct || 0);
+  const ddPct  = clamp(ddUsed / CFT_MAX_DD * 100, 0, 100);
+  document.getElementById("chal-dd-pct-txt").textContent = fmt(ddUsed) + "%";
+  document.getElementById("chal-dd-bar").style.width = ddPct + "%";
+
+  // Phase label
+  let phaseText = "Fase 1 — Objetivo +8% | Max DD -10% | Daily DD -5%";
+  if (cft.target_reached) phaseText = "OBJETIVO ALCANZADO — Solicitar payout a CFT";
+  if (cft.dd_violated)    phaseText = "DRAWDOWN VIOLADO — Cuenta en riesgo";
+  document.getElementById("chal-phase").textContent = phaseText;
+}
+
+// ── ACCOUNT CARD ──────────────────────────────────────────────────────────────
+function renderAccount(state, cft) {
+  const container = document.getElementById("acc-container");
+  if (!state || !cft) {
+    container.innerHTML = '<div style="color:rgba(255,255,255,.2);font-size:13px;padding:20px;letter-spacing:1px">Bot offline — sin datos</div>';
+    return;
+  }
+  const acc    = state.account || {};
+  const bal    = acc.balance || INITIAL_BAL;
+  const eq     = acc.equity  || bal;
+  const pnl    = bal - INITIAL_BAL;
+  const pnlPct = cft.profit_pct || 0;
+  const pnlCls = pnl > 0 ? "pos" : pnl < 0 ? "neg" : "neu";
+  const pnlStr = (pnl >= 0 ? "+" : "") + fmtUSD(pnl) + " (" + fmtPct(pnlPct) + ")";
+  const ddUsed = Math.abs(cft.max_dd_pct || 0);
+  const ddDaily = Math.abs(cft.daily_dd_pct || 0);
+  const progW  = clamp(cft.progress_pct || 0, 0, 100);
+  const ddW    = clamp(ddUsed / CFT_MAX_DD * 100, 0, 100);
+
+  const status     = cft.dd_violated ? "burned" : cft.target_reached ? "passed" : "challenge";
+  const badgeTxt   = {challenge:"EN PRUEBA", passed:"OBJETIVO LOGRADO", burned:"DD VIOLADO"}[status];
+  const cardClass  = status === "passed" ? "passed" : status === "burned" ? "burned" : "";
+
+  container.innerHTML = `
+  <div class="acc-card ${cardClass}">
+    <div class="acc-header">
+      <div>
+        <div class="acc-name">CFT Challenge #${acc.login || "---"}</div>
+        <div class="acc-server">${acc.server || "CryptoFundTrader-Live"} &nbsp;|&nbsp; BTCUSD H1</div>
+      </div>
+      <div class="acc-badge ${status}">${badgeTxt}</div>
+    </div>
+
+    <div class="acc-balance-row">
+      <div class="acc-balance">${fmtUSD(bal)}</div>
+      <div class="acc-btcprice">BTC/USD</div>
+    </div>
+    <div class="acc-pnl ${pnlCls}">${pnlStr} vs $${INITIAL_BAL.toLocaleString()}</div>
+
+    <div class="acc-progress">
+      <div class="acc-prog-header">
+        <span class="acc-prog-label">Progreso objetivo +8%</span>
+        <span class="acc-prog-val">${fmtPct(pnlPct)} / +8%</span>
+      </div>
+      <div class="acc-prog-bar"><div class="acc-prog-fill" style="width:${progW}%"></div></div>
+    </div>
+
+    <div class="acc-progress" style="margin-top:8px">
+      <div class="acc-prog-header">
+        <span class="acc-prog-label">Drawdown maximo</span>
+        <span class="acc-prog-val" style="color:var(--red)">-${fmt(ddUsed)}% / -10%</span>
+      </div>
+      <div class="acc-prog-bar"><div class="acc-prog-fill dd" style="width:${ddW}%"></div></div>
+    </div>
+
+    <div class="acc-divider"></div>
+    <div class="acc-stats">
+      <div class="acc-stat">
+        <div class="acc-stat-val">${fmtUSD(INITIAL_BAL)}</div>
+        <div class="acc-stat-label">Capital ini.</div>
+      </div>
+      <div class="acc-stat">
+        <div class="acc-stat-val">${fmtUSD(eq)}</div>
+        <div class="acc-stat-label">Equity</div>
+      </div>
+      <div class="acc-stat">
+        <div class="acc-stat-val" style="color:var(--red)">-${fmt(ddDaily)}%</div>
+        <div class="acc-stat-label">DD diario</div>
+      </div>
+      <div class="acc-stat">
+        <div class="acc-stat-val" style="color:var(--purple-glow)">${state.signal || "--"}</div>
+        <div class="acc-stat-label">Señal</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── POSICION ABIERTA ──────────────────────────────────────────────────────────
+function renderPosition(state) {
+  const content = document.getElementById("pos-content");
+  const pos     = state?.active_trade;
+
+  if (!pos) {
+    content.innerHTML = '<div class="no-position">Sin posicion abierta — esperando breakout ORB</div>';
+    return;
+  }
+
+  const isLong  = pos.type === "long";
+  const typeTxt = isLong ? "▲ LONG" : "▼ SHORT";
+  const pnl     = (pos.pnl !== undefined) ? pos.pnl : null;
+  const pnlCls  = pnl == null ? "" : pnl >= 0 ? "pnl-pos" : "pnl-neg";
+  const pnlTxt  = pnl == null ? "--" : (pnl >= 0 ? "+" : "") + fmtUSD(pnl);
+
+  content.innerHTML = `
+  <div class="pos-card">
+    <div class="pos-type-badge ${pos.type}">${typeTxt}</div>
+    <div class="pos-fields">
+      <div class="pos-field">
+        <div class="pf-label">Simbolo</div>
+        <div class="pf-val">BTCUSD</div>
+      </div>
+      <div class="pos-field">
+        <div class="pf-label">Entrada</div>
+        <div class="pf-val">${fmtBTC(pos.entry)}</div>
+      </div>
+      <div class="pos-field">
+        <div class="pf-label">Stop Loss</div>
+        <div class="pf-val sl-val">${fmtBTC(pos.sl)}</div>
+      </div>
+      <div class="pos-field">
+        <div class="pf-label">Take Profit</div>
+        <div class="pf-val tp-val">${fmtBTC(pos.tp)}</div>
+      </div>
+      <div class="pos-field">
+        <div class="pf-label">Lote (BTC)</div>
+        <div class="pf-val">${fmt(pos.lot, 3)}</div>
+      </div>
+      <div class="pos-field">
+        <div class="pf-label">P&L</div>
+        <div class="pf-val ${pnlCls}">${pnlTxt}</div>
+      </div>
+      <div class="pos-field">
+        <div class="pf-label">Abierta</div>
+        <div class="pf-val" style="font-size:11px;color:rgba(255,255,255,.5)">${(pos.entry_time || "--").slice(0,16)}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── HISTORIAL ─────────────────────────────────────────────────────────────────
+function renderHistory(trades) {
+  const content = document.getElementById("hist-content");
+  if (!trades || !trades.length) {
+    content.innerHTML = '<div style="color:rgba(255,255,255,.2);font-size:13px;padding:12px 0;text-align:center;letter-spacing:1px">Sin trades registrados aun</div>';
+    return;
+  }
+
+  const rows = [...trades].reverse().slice(0, 30).map(t => {
+    const isWin    = t.pnl_usd > 0;
+    const reason   = t.exit_reason || (isWin ? "WIN" : "SL");
+    const reasonCls= reason === "TP" ? "tp" : reason === "SL" ? "sl" : "eod";
+    const pnlCls   = isWin ? "ht-win" : "ht-loss";
+    const pnlStr   = (t.pnl_usd >= 0 ? "+" : "") + "$" + Math.abs(t.pnl_usd).toFixed(0);
+
+    return `<tr>
+      <td>${(t.entry_date || "--").slice(0,16)}</td>
+      <td>${(t.exit_date || "--").slice(0,16)}</td>
+      <td><span class="ht-type ${t.type}">${t.type?.toUpperCase()}</span></td>
+      <td>${fmtBTC(t.entry)}</td>
+      <td>${fmtBTC(t.exit)}</td>
+      <td>${fmt(t.lot, 3)}</td>
+      <td><span class="ht-reason ${reasonCls}">${reason}</span></td>
+      <td class="${pnlCls}">${pnlStr}</td>
+      <td>${fmtUSD(t.capital)}</td>
+    </tr>`;
+  }).join("");
+
+  content.innerHTML = `
+  <table class="hist-table">
+    <thead><tr>
+      <th>Entrada</th><th>Salida</th><th>Tipo</th>
+      <th>Entry BTC</th><th>Exit BTC</th><th>Lot</th>
+      <th>Razon</th><th>P&L</th><th>Capital</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+// ── EQUITY CHART ──────────────────────────────────────────────────────────────
+function renderEquityChart(equityHistory) {
+  const canvas = document.getElementById("eq-canvas");
+  const ctx    = canvas.getContext("2d");
+  const W      = canvas.offsetWidth;
+  const H      = canvas.offsetHeight;
+  canvas.width  = W;
+  canvas.height = H;
+
+  const data = equityHistory && equityHistory.length > 1
+    ? equityHistory.map(p => p.equity)
+    : [INITIAL_BAL, INITIAL_BAL];
+
+  const minV = Math.min(...data) * 0.998;
+  const maxV = Math.max(...data) * 1.002;
+  const rangeV = maxV - minV || 1;
+
+  const toY = v => H - ((v - minV) / rangeV) * H;
+  const toX = i => (i / (data.length - 1)) * W;
+
+  // Baseline (initial capital)
+  const baseY = toY(INITIAL_BAL);
+  ctx.strokeStyle = "rgba(255,255,255,0.07)";
+  ctx.setLineDash([4,4]);
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, baseY); ctx.lineTo(W, baseY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, "rgba(247,147,26,0.25)");
+  grad.addColorStop(1, "rgba(247,147,26,0.01)");
+
+  ctx.beginPath();
+  ctx.moveTo(toX(0), toY(data[0]));
+  for (let i = 1; i < data.length; i++) ctx.lineTo(toX(i), toY(data[i]));
+  ctx.lineTo(W, H); ctx.lineTo(0, H);
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.moveTo(toX(0), toY(data[0]));
+  for (let i = 1; i < data.length; i++) ctx.lineTo(toX(i), toY(data[i]));
+  ctx.strokeStyle = "rgba(247,147,26,0.9)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Last point dot
+  const lastX = toX(data.length - 1);
+  const lastY = toY(data[data.length - 1]);
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 4, 0, Math.PI * 2);
+  ctx.fillStyle = "var(--btc)";
+  ctx.fill();
+
+  // Stats
+  document.getElementById("eq-max").textContent = "Max: " + fmtUSD(Math.max(...data));
+  document.getElementById("eq-min").textContent = "Min: " + fmtUSD(Math.min(...data));
+}
+
+// ── BOT STATUS ────────────────────────────────────────────────────────────────
+function renderBotStatus(state) {
+  const el  = document.getElementById("bot-status");
+  const txt = document.getElementById("bot-status-text");
+  if (!state) {
+    el.className = "bot-status inactive";
+    txt.textContent = "Bot offline";
+    return;
+  }
+  const sig = state.signal || "";
+  if (sig === "DD_VIOLATED" || sig === "DAILY_DD_VIOLATED") {
+    el.className = "bot-status inactive";
+    txt.textContent = "Pausado — DD";
+  } else if (sig === "TARGET_REACHED") {
+    el.className = "bot-status waiting";
+    txt.textContent = "OBJETIVO LOGRADO";
+  } else if (sig === "holding") {
+    el.className = "bot-status active";
+    txt.textContent = "En Posicion";
+  } else if (sig === "no_signal") {
+    el.className = "bot-status waiting";
+    txt.textContent = "Vigilando ORB";
+  } else {
+    el.className = "bot-status active";
+    txt.textContent = "Bot Activo";
+  }
+  document.getElementById("last-upd").textContent =
+    (state.updated || "--").replace("T"," ").slice(0,19);
+}
+
+// ── STATS ROW ─────────────────────────────────────────────────────────────────
+function renderStats(state, cft) {
+  const acc = state?.account || {};
+  const bal = acc.balance || 0;
+  const eq  = acc.equity  || bal;
+  const pnl = bal - INITIAL_BAL;
+
+  document.getElementById("s-balance").textContent = fmtUSD(bal);
+  document.getElementById("s-pnl").textContent     =
+    (pnl >= 0 ? "+" : "") + fmtUSD(pnl) + " P&L";
+
+  document.getElementById("s-equity").textContent = fmtUSD(eq);
+  const eqDiff = eq - bal;
+  const eqDiffEl = document.getElementById("s-equity-diff");
+  eqDiffEl.textContent = (eqDiff >= 0 ? "+" : "") + fmtUSD(eqDiff) + " open P&L";
+  eqDiffEl.style.color = eqDiff >= 0 ? "var(--green)" : "var(--red)";
+
+  const ddDaily = Math.abs(cft?.daily_dd_pct || 0);
+  const ddEl = document.getElementById("s-daily-dd");
+  ddEl.textContent = "-" + fmt(ddDaily) + "%";
+  ddEl.style.color = ddDaily > 3 ? "var(--red)" : ddDaily > 1.5 ? "var(--orange)" : "var(--green)";
+
+  const sig = state?.signal || "--";
+  const sigEl = document.getElementById("s-signal");
+  sigEl.textContent = sig === "long" ? "LONG" : sig === "short" ? "SHORT" :
+    sig === "holding" ? "HOLDING" : sig === "no_signal" ? "WAITING" : sig;
+  sigEl.style.color = sig === "long" ? "var(--green)" : sig === "short" ? "var(--red)" :
+    sig === "holding" ? "var(--btc)" : "var(--cyan)";
+}
+
+// ── MAIN REFRESH ──────────────────────────────────────────────────────────────
+async function refresh() {
+  const [state, trades, equityHist] = await Promise.all([
+    fetchJSON("state.json"),
+    fetchJSON("trades.json"),
+    fetchJSON("equity.json"),
+  ]);
+
+  const cft = state?.cft;
+
+  renderBotStatus(state);
+  renderChallenge(cft);
+  renderStats(state, cft);
+  renderAccount(state, cft);
+  renderPosition(state);
+  renderHistory(trades || []);
+  renderEquityChart(equityHist || []);
+
+  const utcHour = new Date().getUTCHours();
+  updateORBBanner(utcHour, state);
+}
+
+refresh();
+setInterval(refresh, 30000);   // auto-refresh cada 30s
+</script>
+</body>
+</html>
