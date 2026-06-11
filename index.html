@@ -390,7 +390,10 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;backgroun
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────────────────
-const DATA_PATH    = "../botbtc-ms/data/";
+// Detecta si corre local (localhost) o en GitHub Pages
+const DATA_PATH = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+  ? "http://localhost:8091/"   // servidor local de datos
+  : "../botbtc-ms/data/";
 const INITIAL_BAL  = 10000;
 const CFT_TARGET   = 8;     // %
 const CFT_MAX_DD   = 10;    // %
