@@ -196,7 +196,7 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;backgroun
 <div class="header">
   <div>
     <div class="logo">BOT MINING STORE <em>BTC</em></div>
-    <div class="logo-sub">ORB + MACD/RSI &nbsp;|&nbsp; BTCUSD H1 &nbsp;|&nbsp; Crypto Fund Trader</div>
+    <div class="logo-sub">ORB + Supertrend H4 + Choppiness &nbsp;|&nbsp; BTCUSD H1 &nbsp;|&nbsp; Crypto Fund Trader</div>
   </div>
   <div class="header-right">
     <div class="utc-clock">UTC <span id="utc-time">--:--:--</span></div>
@@ -311,31 +311,56 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;backgroun
   <div id="pos-content"><div class="no-position">Sin posicion abierta — esperando breakout ORB</div></div>
 </div>
 
+<!-- REGIMEN DE MERCADO -->
+<div class="section-title">Regimen de Mercado Actual</div>
+<div id="regime-card" style="background:var(--card-bg);border:1px solid var(--border);padding:16px 20px;margin-bottom:18px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+  <div style="text-align:center">
+    <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:6px">Regimen</div>
+    <div id="rg-regime" style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;color:var(--btc)">--</div>
+    <div id="rg-risk" style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">riesgo --%</div>
+  </div>
+  <div style="text-align:center">
+    <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:6px">Choppiness H4</div>
+    <div id="rg-chop" style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;color:var(--cyan)">--</div>
+    <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">&lt;48 trend | &gt;57 choppy</div>
+  </div>
+  <div style="text-align:center">
+    <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:6px">Supertrend H4</div>
+    <div id="rg-st" style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900">--</div>
+    <div id="rg-st-label" style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">direccion tendencia</div>
+  </div>
+  <div style="text-align:center">
+    <div style="font-size:9px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:6px">Fear &amp; Greed</div>
+    <div id="rg-fg" style="font-family:'Orbitron',sans-serif;font-size:18px;font-weight:900;color:var(--purple-glow)">--</div>
+    <div id="rg-fg-label" style="font-size:10px;color:rgba(255,255,255,.3);margin-top:3px">sentimiento macro</div>
+  </div>
+</div>
+
 <!-- ESTADISTICAS DE BACKTEST (REFERENCIA) -->
-<div class="section-title">Backtest de Referencia — Ene-Jun 2026</div>
+<div class="section-title">Backtest de Referencia v5b — 2 Anos (Jul 2024 – Jun 2026)</div>
 <div class="backtest-grid">
   <div class="bt-card">
-    <div class="bt-val" style="color:var(--green)">+8.1%</div>
-    <div class="bt-label">Max alcanzado</div>
+    <div class="bt-val" style="color:var(--green)">+36.6%</div>
+    <div class="bt-label">Retorno 2 anos</div>
   </div>
   <div class="bt-card">
-    <div class="bt-val" style="color:var(--btc)">73 dias</div>
-    <div class="bt-label">Para +8% CFT</div>
+    <div class="bt-val" style="color:var(--btc)">~35 dias</div>
+    <div class="bt-label">Challenge (mercado tendencial)</div>
   </div>
   <div class="bt-card">
-    <div class="bt-val" style="color:var(--red)">-3.4%</div>
-    <div class="bt-label">DD al target</div>
+    <div class="bt-val" style="color:var(--red)">-7.8%</div>
+    <div class="bt-label">Max Drawdown</div>
   </div>
   <div class="bt-card">
-    <div class="bt-val" style="color:var(--purple-glow)">35.7%</div>
+    <div class="bt-val" style="color:var(--purple-glow)">44.3%</div>
     <div class="bt-label">Winrate</div>
   </div>
   <div class="bt-card">
-    <div class="bt-val" style="color:var(--cyan)">2.16x</div>
+    <div class="bt-val" style="color:var(--cyan)">1.83x</div>
     <div class="bt-label">Ratio G/P</div>
   </div>
   <div class="bt-card">
-    <div class="bt-val" style="color:var(--btc)">1.20</div>
+    <div class="bt-val" style="color:var(--btc)">1.59</div>
     <div class="bt-label">Profit Factor</div>
   </div>
 </div>
@@ -361,7 +386,7 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;backgroun
   </div>
 </div>
 
-<div class="footer">BOT MINING STORE BTC &nbsp;|&nbsp; CRYPTO FUND TRADER &nbsp;|&nbsp; ORB + MACD/RSI BTCUSD H1</div>
+<div class="footer">BOT MINING STORE BTC &nbsp;|&nbsp; CRYPTO FUND TRADER &nbsp;|&nbsp; ORB + SUPERTREND H4 + CHOPPINESS INDEX &nbsp;|&nbsp; v5b</div>
 
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────────────────
@@ -748,6 +773,32 @@ function renderStats(state, cft) {
     sig === "holding" ? "var(--btc)" : "var(--cyan)";
 }
 
+// ── REGIMEN DE MERCADO ────────────────────────────────────────────────────────
+function renderRegime(state) {
+  const pos   = state?.active_trade;
+  const chop  = pos?.h4_chop  ?? state?.h4_chop  ?? null;
+  const stDir = pos?.h4_st_dir ?? state?.h4_st_dir ?? null;
+
+  // Regimen basado en CHOP
+  let regime = "--", riskTxt = "--", regimeColor = "var(--btc)";
+  if (chop !== null) {
+    if      (chop < 48) { regime = "TREND";   riskTxt = "riesgo 1.8%"; regimeColor = "var(--green)"; }
+    else if (chop > 57) { regime = "CHOPPY";  riskTxt = "riesgo 0.5%"; regimeColor = "var(--red)"; }
+    else                { regime = "NEUTRAL"; riskTxt = "riesgo 1.0%"; regimeColor = "var(--btc)"; }
+  }
+  document.getElementById("rg-regime").textContent = regime;
+  document.getElementById("rg-regime").style.color = regimeColor;
+  document.getElementById("rg-risk").textContent   = riskTxt;
+  document.getElementById("rg-chop").textContent   = chop !== null ? fmt(chop, 1) : "--";
+
+  // Supertrend H4
+  const stEl    = document.getElementById("rg-st");
+  const stLabel = document.getElementById("rg-st-label");
+  if (stDir === 1)  { stEl.textContent = "GREEN"; stEl.style.color = "var(--green)"; stLabel.textContent = "solo LONGS"; }
+  else if (stDir === -1) { stEl.textContent = "RED"; stEl.style.color = "var(--red)"; stLabel.textContent = "solo SHORTS"; }
+  else              { stEl.textContent = "--"; stEl.style.color = "rgba(255,255,255,.3)"; stLabel.textContent = "sin datos"; }
+}
+
 // ── MAIN REFRESH ──────────────────────────────────────────────────────────────
 async function refresh() {
   const [state, trades, equityHist] = await Promise.all([
@@ -763,6 +814,7 @@ async function refresh() {
   renderStats(state, cft);
   renderAccount(state, cft);
   renderPosition(state);
+  renderRegime(state);
   renderHistory(trades || []);
   renderEquityChart(equityHist || []);
 
