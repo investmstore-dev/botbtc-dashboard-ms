@@ -398,10 +398,12 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:2px;backgroun
 <script>
 // ── CONFIG ──────────────────────────────────────────────────────────────────
 // Detecta si corre local (localhost) o en GitHub Pages
+// Puerto de datos = puerto del dashboard + 1 (8090->8091, instancia ADN 8100->8101)
+const _dataPort = location.port ? (parseInt(location.port) + 1) : 8091;
 const DATA_PATH = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
-  ? "http://localhost:8091/"   // servidor local de datos
+  ? `http://localhost:${_dataPort}/`   // servidor local de datos de ESTA instancia
   : "../botbtc-ms/data/";
-const INITIAL_BAL  = 10000;
+let INITIAL_BAL  = 10000;   // se actualiza desde state.cft.initial_balance por cuenta
 const CFT_TARGET   = 8;     // %
 const CFT_MAX_DD   = 10;    // %
 const CFT_DAILY_DD = 5;     // %
@@ -872,6 +874,8 @@ async function refresh() {
     fetchJSON("equity.json"),
     fetchJSON("accounts.json"),
   ]);
+
+  if (state && state.cft && state.cft.initial_balance) INITIAL_BAL = state.cft.initial_balance;
 
   const accounts = buildAccounts(state, accountsDoc);
   const primary  = accounts.find(a => a.status === "challenge") || accounts[0] || null;
